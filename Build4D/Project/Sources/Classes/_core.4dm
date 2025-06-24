@@ -1136,12 +1136,12 @@ Function _generateLicense($appType : Integer) : Boolean
 			Case of 
 					
 				: ($appType=4D Desktop)
-					$status:=Create deployment license(This.settings.destinationFolder)
-					//$status:=Create deployment license(This.settings.destinationFolder; 4D Desktop)
+					$status:=Create deployment license(This.settings.destinationFolder; 4D Volume desktop)
+					//$status:=Create deployment license(This.settings.destinationFolder; 4D Volume Desktop)
 					
 				: ($appType=4D Server)
 					//$status:=Create deployment license(This.settings.destinationFolder; 4D Server)
-					$status:=Create deployment license(This.settings.destinationFolder; *)
+					$status:=Create deployment license(This.settings.destinationFolder; 4D Server)
 					
 				Else 
 					
