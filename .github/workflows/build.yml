@@ -71,6 +71,7 @@ jobs:
           build: ${{env.TOOL4D_BUILDNUMBER}}
           actions: "build"
           token: ${{ secrets.TOOL4D_DL_TOKEN }}
+          ignore-warnings: true
 
       - name: 🧪 Run Unit Tests
         uses: ./.github/actions/tool4d-action
@@ -79,7 +80,7 @@ jobs:
           product-line: ${{env.TOOL4D_PRODUCT_LINE}}
           version: ${{env.TOOL4D_VERSION}}
           build: ${{env.TOOL4D_BUILDNUMBER}}
-          #token: ${{ secrets.DLTK }} 
+          token: ${{ secrets.TOOL4D_DL_TOKEN }}
           startup-method: runAutomaticUnitTests
 
       - name : 🚢  Archive Actifacts
