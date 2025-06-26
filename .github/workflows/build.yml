@@ -60,7 +60,7 @@ jobs:
 
       - name: 🚚  Copy ${{ github.event.repository.name }}.4dbase to ${{ github.event.repository.name }}_UnitTests/Components directory
         run: |
-          cp -r ${{ github.event.repository.name }}/build/ ${{ github.event.repository.name }}_UnitTests/Components
+          cp -r ${{ github.workspace }}/${{ github.event.repository.name }}/${{ github.event.repository.name }}/build/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Components
 
       - name: 🏗️ Build ${{ github.event.repository.name }}_UnitTests
         uses: ./.github/actions/build4d-action
