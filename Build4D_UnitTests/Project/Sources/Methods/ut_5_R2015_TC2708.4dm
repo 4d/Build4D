@@ -1,6 +1,6 @@
 //%attributes = {"invisible":true}
 // Test the Client application
-var $build : cs.Build4D.CompiledProject
+var $build : cs.Build4D.Client
 var $settings : Object
 var $success : Boolean
 var $destinationFolder : 4D.Folder
