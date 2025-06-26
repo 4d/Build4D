@@ -80,7 +80,7 @@ jobs:
           version: ${{env.TOOL4D_VERSION}}
           build: ${{env.TOOL4D_BUILDNUMBER}}
           #token: ${{ secrets.DLTK }} 
-          #startup-method: start_tests
+          startup-method: runAutomaticUnitTests
 
       - name : 🚢  Archive Actifacts
         uses: actions/upload-artifact@v4
