@@ -89,7 +89,7 @@ jobs:
           product-line: ${{env.TOOL4D_PRODUCT_LINE}}
           version: ${{env.TOOL4D_VERSION}}
           build: ${{env.TOOL4D_BUILDNUMBER}}
-          token: ${{ secrets.TOOL4D_DL_TOKEN }}
+          token: ${{ secrets.SETUP4D_DL_TOKEN }}
 
       - name: 🧪 Run Unit Tests
         uses: ./.github/actions/tool4d-action
