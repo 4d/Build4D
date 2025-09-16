@@ -13,9 +13,9 @@ env:
   #TOOL4D_PRODUCT_LINE: 'vcs'
   #TOOL4D_VERSION: 'vcs'
   #TOOL4D_BUILDNUMBER : 'official'
-  TOOL4D_PRODUCT_LINE: 'main'
-  TOOL4D_VERSION: 'main'
-  TOOL4D_BUILDNUMBER : '297768'
+  TOOL4D_PRODUCT_LINE: '20Rx'
+  TOOL4D_VERSION: '20R10'
+  TOOL4D_BUILDNUMBER : '100221'
 
 jobs:
   build:
@@ -24,10 +24,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest,macos-latest]
-        #os: [ ubuntu-latest]
+
 
     runs-on: ${{ matrix.os }}
-  
     steps:
       - name: 📄 Checkout repository
         uses: actions/checkout@v4
