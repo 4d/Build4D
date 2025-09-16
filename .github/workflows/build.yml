@@ -10,9 +10,12 @@ on:
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
 
 env:
-  TOOL4D_PRODUCT_LINE: 'vcs'
-  TOOL4D_VERSION: 'vcs'
-  TOOL4D_BUILDNUMBER : 'official'
+  #TOOL4D_PRODUCT_LINE: 'vcs'
+  #TOOL4D_VERSION: 'vcs'
+  #TOOL4D_BUILDNUMBER : 'official'
+  TOOL4D_PRODUCT_LINE: 'main'
+  TOOL4D_VERSION: 'main'
+  TOOL4D_BUILDNUMBER : '297768'
 
 jobs:
   build:
