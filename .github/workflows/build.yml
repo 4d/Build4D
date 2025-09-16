@@ -87,9 +87,6 @@ jobs:
       - name: Move 4DSetup work directory to UnitTests project Work directory
         run: |
           mv ${{ github.workspace }}/.github/actions/setup4d-action/work/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Work/
-          
-
-
 
       - name: 🏗️ Build ${{ github.event.repository.name }}_UnitTests
         uses: ./.github/actions/build4d-action
