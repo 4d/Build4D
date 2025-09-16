@@ -76,6 +76,16 @@ jobs:
         run: |
           cp -r ${{ github.workspace }}/${{ github.event.repository.name }}/build/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Components
 
+
+
+      - name: Prepare Setup4d
+        uses: ./.github/actions/setup4d-action
+        with:
+          product-line: ${{env.SETUP4D_PRODUCT_LINE}}
+          version: ${{env.SETUP4D_VERSION}}
+          build-number: ${{env.SETUP4D_BUILDNUMBER}}
+          token: ${{ secrets.SETUP4D_DL_TOKEN }}
+
       - name: 🏗️ Build ${{ github.event.repository.name }}_UnitTests
         uses: ./.github/actions/build4d-action
         with:
@@ -86,15 +96,6 @@ jobs:
           actions: "build"
           token: ${{ secrets.TOOL4D_DL_TOKEN }}
           ignore-warnings: true
-
-
-      - name: Prepare Setup4d
-        uses: ./.github/actions/setup4d-action
-        with:
-          product-line: ${{env.SETUP4D_PRODUCT_LINE}}
-          version: ${{env.SETUP4D_VERSION}}
-          build: ${{env.SETUP4D_BUILDNUMBER}}
-          token: ${{ secrets.SETUP4D_DL_TOKEN }}
 
       - name: 🧪 Run Unit Tests
         uses: ./.github/actions/tool4d-action
