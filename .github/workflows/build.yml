@@ -16,6 +16,9 @@ env:
   TOOL4D_PRODUCT_LINE: '20Rx'
   TOOL4D_VERSION: '20R10'
   TOOL4D_BUILDNUMBER : '100221'
+  SETUP4D_PRODUCT_LINE: 'Rx'
+  SETUP4D_VERSION: '20R10'
+  SETUP4D_BUILDNUMBER : '100221'
 
 jobs:
   build:
@@ -58,7 +61,7 @@ jobs:
           path: .github/actions/setup4d-action
           
     
-      - name: 🏗️  Build ${{ github.event.repository.name }}
+      - name: 🏗️ Build ${{ github.event.repository.name }}
         uses: ./.github/actions/build4d-action
         with:
           project: ${{ github.workspace }}/${{ github.event.repository.name }}/Project/${{ github.event.repository.name }}.4DProject
@@ -97,9 +100,9 @@ jobs:
         uses: ./.github/actions/tool4d-action
         with:
           project: ${{ github.event.repository.name }}_UnitTests/Project/${{ github.event.repository.name }}_UnitTests.4DProject
-          product-line: ${{env.TOOL4D_PRODUCT_LINE}}
-          version: ${{env.TOOL4D_VERSION}}
-          build: ${{env.TOOL4D_BUILDNUMBER}}
+          product-line: ${{env.SETUP4D_PRODUCT_LINE}}
+          version: ${{env.SETUP4D_VERSION}}
+          build: ${{env.SETUP4D_BUILDNUMBER}}
           token: ${{ secrets.TOOL4D_DL_TOKEN }}
           startup-method: runAutomaticUnitTests
 
