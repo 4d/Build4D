@@ -20,7 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-         os: [ windows-latest,macos-latest]
+        os: [ windows-latest,macos-latest]
+        #os: [ ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
   
@@ -46,7 +47,15 @@ jobs:
           repository: 4d/tool4d-action
           token: ${{ secrets.GH_4D_ACTION_TOKEN }}
           path: .github/actions/tool4d-action
-        
+
+      - name: Checkout setup4d-action
+        uses:  actions/checkout@v4
+        with: 
+          repository: 4d/setup4d-action
+          token: ${{ secrets.GH_4D_ACTION_TOKEN }}
+          path: .github/actions/setup4d-action
+          
+    
       - name: 🏗️  Build ${{ github.event.repository.name }}
         uses: ./.github/actions/build4d-action
         with:
@@ -72,6 +81,15 @@ jobs:
           actions: "build"
           token: ${{ secrets.TOOL4D_DL_TOKEN }}
           ignore-warnings: true
+
+
+      - name: Prepare Setup4d
+        uses: ./.github/actions/setup4d-action
+        with:
+          product-line: ${{env.TOOL4D_PRODUCT_LINE}}
+          version: ${{env.TOOL4D_VERSION}}
+          build: ${{env.TOOL4D_BUILDNUMBER}}
+          token: ${{ secrets.TOOL4D_DL_TOKEN }}
 
       - name: 🧪 Run Unit Tests
         uses: ./.github/actions/tool4d-action
@@ -100,6 +118,8 @@ jobs:
               echo "Unit tests failed"
               exit 1
             fi
+  
+
 
 
           
