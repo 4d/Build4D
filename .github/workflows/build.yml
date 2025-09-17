@@ -1,18 +1,13 @@
-name: build
+name: Build
 
 on:
   push:
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
-    #branches:
-    #  - main
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
 
 env:
-  #TOOL4D_PRODUCT_LINE: 'vcs'
-  #TOOL4D_VERSION: 'vcs'
-  #TOOL4D_BUILDNUMBER : 'official'
   TOOL4D_PRODUCT_LINE: '20Rx'
   TOOL4D_VERSION: '20R10'
   TOOL4D_BUILDNUMBER : '100221'
