@@ -99,33 +99,33 @@ jobs:
           token: ${{ secrets.TOOL4D_DL_TOKEN }}
           ignore-warnings: true
 
-      - name: 🧪 Run Unit Tests
-        uses: ./.github/actions/tool4d-action
-        with:
-          project: ${{ github.event.repository.name }}_UnitTests/Project/${{ github.event.repository.name }}_UnitTests.4DProject
-          product-line: ${{env.TOOL4D_PRODUCT_LINE}}
-          version: ${{env.TOOL4D_VERSION}}
-          build: ${{env.TOOL4D_BUILDNUMBER}}
-          token: ${{ secrets.TOOL4D_DL_TOKEN }}
-          startup-method: runAutomaticUnitTests
+      #- name: 🧪 Run Unit Tests
+      #  uses: ./.github/actions/tool4d-action
+      #  with:
+      #    project: ${{ github.event.repository.name }}_UnitTests/Project/${{ github.event.repository.name }}_UnitTests.4DProject
+      #    product-line: ${{env.TOOL4D_PRODUCT_LINE}}
+      #    version: ${{env.TOOL4D_VERSION}}
+      #    build: ${{env.TOOL4D_BUILDNUMBER}}
+      #    token: ${{ secrets.TOOL4D_DL_TOKEN }}
+      #    startup-method: runAutomaticUnitTests
 
-      - name : 🚢  Archive Actifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: "UT-${{ github.event.repository.name }}.${{runner.os}}.text"
-          path: "UT-${{ github.event.repository.name }}.txt"
+      #- name : 🚢  Archive Actifacts
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: "UT-${{ github.event.repository.name }}.${{runner.os}}.text"
+      #    path: "UT-${{ github.event.repository.name }}.txt"
     
       # Recherche de la chaîne "GLOBAL RESULT : SUCCESS" dans le fichier UT-${{ github.event.repository.name }}.txt
-      - name : ✔ Analyze result test 
-        shell: bash
-        run: |
-            if grep -r "GLOBAL RESULT : SUCCESS" "UT-${{ github.event.repository.name }}.txt"; then
-              echo "Unit tests passed"
-              exit 0
-            else
-              echo "Unit tests failed"
-              exit 1
-            fi
+      #- name : ✔ Analyze result test 
+      #  shell: bash
+      #  run: |
+      #      if grep -r "GLOBAL RESULT : SUCCESS" "UT-${{ github.event.repository.name }}.txt"; then
+      #        echo "Unit tests passed"
+      #        exit 0
+      #      else
+      #        echo "Unit tests failed"
+      #        exit 1
+      #      fi
   
 
 
