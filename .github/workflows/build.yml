@@ -1,0 +1,130 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']           # Only run on branches
+    tags-ignore: ['*']         # Ignore all tags
+    paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
+
+env:
+  TOOL4D_PRODUCT_LINE: '20Rx'
+  TOOL4D_VERSION: '20R10'
+  TOOL4D_BUILDNUMBER : '100221'
+  SETUP4D_PRODUCT_LINE: 'Rx'
+  SETUP4D_VERSION: '20R10'
+  SETUP4D_BUILDNUMBER : '100221'
+
+jobs:
+  build:
+    name: "Build on ${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest,macos-latest]
+
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 📄 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+
+
+      - name: Checkout build4d-action
+        uses:  actions/checkout@v4
+        with: 
+          repository: 4d/build4d-action
+          token: ${{ secrets.GH_4D_ACTION_TOKEN }}
+          path: .github/actions/build4d-action
+
+      - name: Checkout tool4d-action
+        uses:  actions/checkout@v4
+        with: 
+          repository: 4d/tool4d-action
+          token: ${{ secrets.GH_4D_ACTION_TOKEN }}
+          path: .github/actions/tool4d-action
+
+      - name: Checkout setup4d-action
+        uses:  actions/checkout@v4
+        with: 
+          repository: 4d/setup4d-action
+          token: ${{ secrets.GH_4D_ACTION_TOKEN }}
+          path: .github/actions/setup4d-action
+          
+    
+      - name: 🏗️ Build ${{ github.event.repository.name }}
+        uses: ./.github/actions/build4d-action
+        with:
+          project: ${{ github.workspace }}/${{ github.event.repository.name }}/Project/${{ github.event.repository.name }}.4DProject
+          product-line: ${{env.TOOL4D_PRODUCT_LINE}}
+          version: ${{env.TOOL4D_VERSION}}
+          actions: "build,pack"
+          build: ${{env.TOOL4D_BUILDNUMBER}}
+          token: ${{ secrets.TOOL4D_DL_TOKEN }}
+          ignore-warnings: true
+
+      - name: 🚚  Copy ${{ github.event.repository.name }}.4dbase to ${{ github.event.repository.name }}_UnitTests/Components directory
+        run: |
+          cp -r ${{ github.workspace }}/${{ github.event.repository.name }}/build/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Components
+
+      - name: Download Setup4d
+        uses: ./.github/actions/setup4d-action
+        with:
+          product-line: ${{env.SETUP4D_PRODUCT_LINE}}
+          version: ${{env.SETUP4D_VERSION}}
+          build-number: ${{env.SETUP4D_BUILDNUMBER}}
+          token: ${{ secrets.SETUP4D_DL_TOKEN }}
+
+      - name: Move 4DSetup work directory to UnitTests project Work directory
+        run: |
+          mv ${{ github.workspace }}/.github/actions/setup4d-action/work/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Work/
+
+      - name: 🏗️ Build ${{ github.event.repository.name }}_UnitTests
+        uses: ./.github/actions/build4d-action
+        with:
+          project: ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Project/${{ github.event.repository.name }}_UnitTests.4DProject
+          product-line: ${{env.TOOL4D_PRODUCT_LINE}}
+          version: ${{env.TOOL4D_VERSION}}
+          build: ${{env.TOOL4D_BUILDNUMBER}}
+          actions: "build"
+          token: ${{ secrets.TOOL4D_DL_TOKEN }}
+          ignore-warnings: true
+
+      #- name: 🧪 Run Unit Tests
+      #  uses: ./.github/actions/tool4d-action
+      #  with:
+      #    project: ${{ github.event.repository.name }}_UnitTests/Project/${{ github.event.repository.name }}_UnitTests.4DProject
+      #    product-line: ${{env.TOOL4D_PRODUCT_LINE}}
+      #    version: ${{env.TOOL4D_VERSION}}
+      #    build: ${{env.TOOL4D_BUILDNUMBER}}
+      #    token: ${{ secrets.TOOL4D_DL_TOKEN }}
+      #    startup-method: runAutomaticUnitTests
+
+      #- name : 🚢  Archive Actifacts
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: "UT-${{ github.event.repository.name }}.${{runner.os}}.text"
+      #    path: "UT-${{ github.event.repository.name }}.txt"
+    
+      # Recherche de la chaîne "GLOBAL RESULT : SUCCESS" dans le fichier UT-${{ github.event.repository.name }}.txt
+      #- name : ✔ Analyze result test 
+      #  shell: bash
+      #  run: |
+      #      if grep -r "GLOBAL RESULT : SUCCESS" "UT-${{ github.event.repository.name }}.txt"; then
+      #        echo "Unit tests passed"
+      #        exit 0
+      #      else
+      #        echo "Unit tests failed"
+      #        exit 1
+      #      fi
+  
+
+
+
+          
