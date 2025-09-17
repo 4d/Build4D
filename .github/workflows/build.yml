@@ -2,6 +2,8 @@ name: Build
 
 on:
   push:
+    branches: ['**']           # Only run on branches
+    tags-ignore: ['*']         # Ignore all tags
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
   pull_request:
     types: [opened, synchronize, reopened]
