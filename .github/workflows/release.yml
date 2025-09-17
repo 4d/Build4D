@@ -16,7 +16,7 @@ env:
 jobs:
   build:
     name: "Build"
-    runs-on: [macOS]
+    runs-on: [macos-latest]
     steps:
     - name: 📄 Checkout repository
       uses: actions/checkout@v4
@@ -93,7 +93,7 @@ jobs:
 
       - name: Display Artifact Directory Content
         run: ls -R artifact
-        
+
       - name: 📦 release package
         run: |
           gh release upload ${{github.event.release.tag_name}} "${{github.workspace}}/artifact/${{ github.event.repository.name }}.zip"
