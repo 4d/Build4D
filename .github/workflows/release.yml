@@ -19,25 +19,36 @@ jobs:
     runs-on: [macos-latest]
     steps:
     - name: 📄 Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         lfs: true
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
 
     - name: Checkout build4d-action
-      uses:  actions/checkout@v4
+      uses:  actions/checkout@v5
       with: 
         repository: 4d/build4d-action
         token: ${{ secrets.GH_4D_ACTION_TOKEN }}
         path: .github/actions/build4d-action
 
     - name: Checkout tool4d-action
-      uses:  actions/checkout@v4
+      uses:  actions/checkout@v5
       with: 
         repository: 4d/tool4d-action
         token: ${{ secrets.GH_4D_ACTION_TOKEN }}
         path: .github/actions/tool4d-action
+
+
+    - name: Extract version
+      run: |
+        echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+    - name: "Set release version to Info.plist"
+      run: |
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "${GITHUB_WORKSPACE}/${{ github.event.repository.name }}/Info.plist"
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "${GITHUB_WORKSPACE}/${{ github.event.repository.name }}/Info.plist"
+        cat "${GITHUB_WORKSPACE}/${{ github.event.repository.name }}/Info.plist"
           
     
     - name: 🏗️ Build ${{ github.event.repository.name }}
