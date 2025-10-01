@@ -34,7 +34,7 @@ jobs:
           lfs: true
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
-       
+
       - name: 🏗️ Build ${{ github.event.repository.name }}
         uses: 4d/build4d-action@main
         with:
@@ -50,8 +50,15 @@ jobs:
         run: |
           cp -r ${{ github.workspace }}/${{ github.event.repository.name }}/build/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Components
 
+      - name: Checkout setup4d-action
+        uses:  actions/checkout@v4
+        with: 
+          repository: 4d/setup4d-action
+          token: ${{ secrets.GH_4D_ACTION_TOKEN }}
+          path: .github/actions/setup4d-action
+
       - name: Download Setup4d
-        uses: 4d/setup4d-action@main
+        uses: ./.github/actions/setup4d-action
         with:
           product-line: ${{env.SETUP4D_PRODUCT_LINE}}
           version: ${{env.SETUP4D_VERSION}}
