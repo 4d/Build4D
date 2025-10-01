@@ -16,7 +16,7 @@ env:
 jobs:
   build:
     name: "Build"
-    runs-on: [macos-latest]
+    runs-on: [macOS]
     steps:
     - name: 📄 Checkout repository
       uses: actions/checkout@v5
@@ -24,22 +24,6 @@ jobs:
         lfs: true
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
-
-    - name: Checkout build4d-action
-      uses:  actions/checkout@v5
-      with: 
-        repository: 4d/build4d-action
-        token: ${{ secrets.GH_4D_ACTION_TOKEN }}
-        path: .github/actions/build4d-action
-
-    - name: Checkout tool4d-action
-      uses:  actions/checkout@v5
-      with: 
-        repository: 4d/tool4d-action
-        token: ${{ secrets.GH_4D_ACTION_TOKEN }}
-        path: .github/actions/tool4d-action
-
-
     - name: Extract version
       run: |
         echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
@@ -50,31 +34,30 @@ jobs:
         /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "${GITHUB_WORKSPACE}/${{ github.event.repository.name }}/Info.plist"
         cat "${GITHUB_WORKSPACE}/${{ github.event.repository.name }}/Info.plist"
           
-    
     - name: 🏗️ Build ${{ github.event.repository.name }}
-      uses: ./.github/actions/build4d-action
+      uses: 4d/build4d-action@main
       with:
         project: ${{ github.workspace }}/${{ github.event.repository.name }}/Project/${{ github.event.repository.name }}.4DProject
         product-line: ${{env.TOOL4D_PRODUCT_LINE}}
         version: ${{env.TOOL4D_VERSION}}
-        targets : all
-        #actions: "build,pack,sign,archive"
-        actions: "build,pack,archive"
         build: ${{env.TOOL4D_BUILDNUMBER}}
         token: ${{ secrets.TOOL4D_DL_TOKEN }}
+        targets : all
+        actions: "clean,build,pack,sign,archive"
+        sign-certificate: "Developer ID Application: 4D"
+        sign-as-bundle: true
         ignore-warnings: true
 
-
-    #- name: Notarize
-    #  run: |
-    #    xcrun notarytool submit "${{ github.event.repository.name }}/build/${{ github.event.repository.name }}.zip" --keychain-profile "notary" --wait >> notary_tool.log
-    #    if grep -r "status: Accepted" "notary_tool.log"; then
-    #      echo "Notarize Success"
-    #      exit 0
-    #    else
-    #      echo "Notarize Failed"
-    #      exit 1
-    #    fi
+    - name: Notarize
+      run: |
+        xcrun notarytool submit "${{ github.event.repository.name }}/build/${{ github.event.repository.name }}.zip" --keychain-profile "notary4d" --wait >> notary_tool.log
+        if grep -r "status: Accepted" "notary_tool.log"; then
+          echo "Notarize Success"
+          exit 0
+        else
+          echo "Notarize Failed"
+          exit 1
+        fi
             
     - name: Upload Artifact
       if: github.event_name != 'pull_request'
