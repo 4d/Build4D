@@ -5,6 +5,7 @@ on:
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
     branches:
       - main        # Only run on branches
+    tags-ignore: ['*']         # Ignore all tags
   pull_request:
     types: [opened, synchronize, reopened]
     paths-ignore: ['**.md', '.vscode/**','docs/**','pictures/**']
