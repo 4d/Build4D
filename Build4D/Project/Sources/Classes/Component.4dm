@@ -48,6 +48,8 @@ Function _setAppOptions() : Boolean
 	
 	$appInfo.NSHumanReadableCopyright:=This.settings.versioning.copyright
 	
+	$appInfo.CFBundlePackageType:="BNDL"
+	
 	$infoFile.setAppInfo($appInfo)
 	
 	
