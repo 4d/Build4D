@@ -59,17 +59,14 @@ jobs:
           token: ${{ secrets.GH_4D_ACTION_TOKEN }}
           path: .github/actions/setup4d-action
 
-      - name: Download Setup4d
+      - name: Download Setup4d to ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Work/ directory
         uses: ./.github/actions/setup4d-action
         with:
           product-line: ${{env.SETUP4D_PRODUCT_LINE}}
           version: ${{env.SETUP4D_VERSION}}
           build-number: ${{env.SETUP4D_BUILDNUMBER}}
           token: ${{ secrets.SETUP4D_DL_TOKEN }}
-
-      - name: Move 4DSetup work directory to UnitTests project Work directory
-        run: |
-          mv ${{ github.workspace }}/.github/actions/setup4d-action/work/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Work/
+          work-directory: ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Work/
 
       - name: 🏗️ Build ${{ github.event.repository.name }}_UnitTests
         uses: 4d/build4d-action@main
