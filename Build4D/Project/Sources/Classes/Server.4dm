@@ -1,6 +1,7 @@
 Class extends _core
 
 property _target : Text
+property _hasLicenses : Boolean
 
 
 //MARK:-
@@ -49,36 +50,49 @@ Class constructor($customSettings : Object)
 			This.settings.packedProject:=True
 		End if 
 		
-		//Checking license
-		
-		If (This._hasLicenses())
-			
-		Else 
-			This._log(New object(\
-				"function"; "License file checking"; \
-				"message"; "License file doesn't exist"; \
-				"severity"; Error message; \
-				"path"; This.settings.license.path))
-			
-		End if 
-		
-		
-		//If ((This.settings.license=Null) || (Not(OB Instance of(This.settings.license; 4D.File))))
-		//This._log(New object(\
-			"function"; "License file checking"; \
-			"message"; "License file is not defined"; \
-			"severity"; Information message))
-		//Else 
-		//If (Not(This.settings.license.exists))
-		////This._validInstance:=False
-		//This._log(New object(\
-			"function"; "License file checking"; \
-			"message"; "License file doesn't exist"; \
-			"severity"; Error message; \
-			"path"; This.settings.license.path))
-		//End if 
-		//End if 
-		
+		// Checking license
+		// Fix ACI0105672
+		This._hasLicenses:=False
+		Case of 
+				
+			: ((Value type(This.settings.license)=Is text) && (This.settings.license=License Automatic mode))
+				This._hasLicenses:=True
+				This._log(New object(\
+					"function"; "License file checking"; \
+					"message"; "Automatic license integration"; \
+					"severity"; Information message))
+				
+			: (Value type(This.settings.license)=Is object) && (OB Instance of(This.settings.license; 4D.File) && OB Instance of(This.settings.xmlKeyLicense; 4D.File))
+				
+				If (Not(This.settings.license.exists && This.settings.xmlKeyLicense.exists))
+					If (Not(This.settings.license.exists))
+						This._log(New object(\
+							"function"; "License file checking"; \
+							"message"; "License file doesn't exist"; \
+							"severity"; Error message; \
+							"path"; This.settings.license.path))
+					End if 
+					If (Not(This.settings.xmlKeyLicense.exists))
+						This._log(New object(\
+							"function"; "License file checking"; \
+							"message"; "XML Key license file doesn't exist"; \
+							"severity"; Error message; \
+							"path"; This.settings.xmlKeyLicense.path))
+					End if 
+				Else 
+					This._hasLicenses:=True
+					This._log(New object(\
+						"function"; "License file checking"; \
+						"message"; "License files are correctly defined"; \
+						"severity"; Information message))
+				End if 
+				
+			Else 
+				This._log(New object(\
+					"function"; "License file checking"; \
+					"message"; "License file is not defined"; \
+					"severity"; Information message))
+		End case 
 		
 		//Checking source app
 		If ((This.settings.sourceAppFolder=Null) || (Not(OB Instance of(This.settings.sourceAppFolder; 4D.Folder))))
@@ -372,43 +386,7 @@ Function _setAppOptions() : Boolean
 		
 	End if 
 	
-	
 	return False
-	
-	
-	
-	//MARK:- Add embedded database in client app
-	
-/*
-	
-Function _hasLicenses() -> $status : Boolean
-....................................................................................
-Parameter      Type         in/out        Description
-....................................................................................
-$status        Boolean       out          True if licenses are associated in the settings.
-....................................................................................
-	
-*/
-	
-Function _hasLicenses : Boolean
-	
-	Case of 
-			
-		: ((Value type(This.settings.license)=Is text) && (This.settings.license=License Automatic mode))
-			return True
-			
-			
-		: (Value type(This.settings.license)=Is object) && (OB Instance of(This.settings.license; 4D.File) && OB Instance of(This.settings.xmlKeyLicense; 4D.File))
-			
-			return This.settings.license.exists && This.settings.xmlKeyLicense.exists
-			
-			
-		Else 
-			
-			return False
-			
-	End case 
-	
 	
 	
 	//MARK:- fix from bugbase
@@ -1063,7 +1041,7 @@ $infos.OtherIconFolder": "DarkMode",
 			
 		End if 
 		
-		If (This._hasLicenses())
+		If (This._hasLicenses)
 			
 			$success:=($success) ? This._generateLicense(4D Server) : False
 			

@@ -14,19 +14,6 @@
 				"Summary": ""
 			}
 		},
-		"CompiledProject": {
-			"new()": {
-				"Syntax": "**.new**( *customSettings* : Object )",
-				"Params": [
-					[
-						"customSettings",
-						"Object",
-						"->"
-					]
-				],
-				"Summary": ""
-			}
-		},
 		"_core": {
 			"new()": {
 				"Syntax": "**.new**( *target* : Text; *customSettings* : Object )",
@@ -45,7 +32,7 @@
 				"Summary": ""
 			}
 		},
-		"Client": {
+		"CompiledProject": {
 			"new()": {
 				"Syntax": "**.new**( *customSettings* : Object )",
 				"Params": [
@@ -59,6 +46,19 @@
 			}
 		},
 		"Component": {
+			"new()": {
+				"Syntax": "**.new**( *customSettings* : Object )",
+				"Params": [
+					[
+						"customSettings",
+						"Object",
+						"->"
+					]
+				],
+				"Summary": ""
+			}
+		},
+		"Client": {
 			"new()": {
 				"Syntax": "**.new**( *customSettings* : Object )",
 				"Params": [
@@ -97,28 +97,6 @@
 			],
 			"Summary": ""
 		},
-		"get phpAddress()": {
-			"Syntax": "**.get phpAddress**() : Text",
-			"Params": [
-				[
-					"",
-					"Text",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"get publishPort()": {
-			"Syntax": "**.get publishPort**() : Integer",
-			"Params": [
-				[
-					"",
-					"Integer",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
 		"buildZip()": {
 			"Syntax": "**.buildZip**()->result : Object",
 			"Params": [
@@ -130,12 +108,12 @@
 			],
 			"Summary": ""
 		},
-		"get phpPort()": {
-			"Syntax": "**.get phpPort**() : Integer",
+		"get phpAddress()": {
+			"Syntax": "**.get phpAddress**() : Text",
 			"Params": [
 				[
 					"",
-					"Integer",
+					"Text",
 					"<-"
 				]
 			],
@@ -152,26 +130,34 @@
 			],
 			"Summary": ""
 		},
+		"get phpPort()": {
+			"Syntax": "**.get phpPort**() : Integer",
+			"Params": [
+				[
+					"",
+					"Integer",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
+		"get publishPort()": {
+			"Syntax": "**.get publishPort**() : Integer",
+			"Params": [
+				[
+					"",
+					"Integer",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
 		"get publishName()": {
 			"Syntax": "**.get publishName**() : Text",
 			"Params": [
 				[
 					"",
 					"Text",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"_inheritedFrom_": "_core"
-	},
-	"CompiledProject": {
-		"build()": {
-			"Syntax": "**.build**()->success : Boolean",
-			"Params": [
-				[
-					"success",
-					"Boolean",
 					"<-"
 				]
 			],
@@ -196,8 +182,19 @@
 			],
 			"Summary": ""
 		},
-		"get is_win_target()": {
-			"Syntax": "**.get is_win_target**() : Boolean",
+		"get buildName()": {
+			"Syntax": "**.get buildName**() : Text",
+			"Params": [
+				[
+					"",
+					"Text",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
+		"get is_client()": {
+			"Syntax": "**.get is_client**() : Boolean",
 			"Params": [
 				[
 					"",
@@ -218,41 +215,8 @@
 			],
 			"Summary": ""
 		},
-		"get buildName()": {
-			"Syntax": "**.get buildName**() : Text",
-			"Params": [
-				[
-					"",
-					"Text",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"get is_component()": {
-			"Syntax": "**.get is_component**() : Boolean",
-			"Params": [
-				[
-					"",
-					"Boolean",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"get is_client()": {
-			"Syntax": "**.get is_client**() : Boolean",
-			"Params": [
-				[
-					"",
-					"Boolean",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"get is_server()": {
-			"Syntax": "**.get is_server**() : Boolean",
+		"get is_win_target()": {
+			"Syntax": "**.get is_win_target**() : Boolean",
 			"Params": [
 				[
 					"",
@@ -273,6 +237,28 @@
 			],
 			"Summary": ""
 		},
+		"get is_server()": {
+			"Syntax": "**.get is_server**() : Boolean",
+			"Params": [
+				[
+					"",
+					"Boolean",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
+		"get is_component()": {
+			"Syntax": "**.get is_component**() : Boolean",
+			"Params": [
+				[
+					"",
+					"Boolean",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
 		"settings": {
 			"Syntax": "settings : Object"
 		},
@@ -280,9 +266,37 @@
 			"Syntax": "logs : Collection"
 		}
 	},
+	"CompiledProject": {
+		"build()": {
+			"Syntax": "**.build**()->success : Boolean",
+			"Params": [
+				[
+					"success",
+					"Boolean",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
+		"_inheritedFrom_": "_core"
+	},
+	"Component": {
+		"build()": {
+			"Syntax": "**.build**()->success : Boolean",
+			"Params": [
+				[
+					"success",
+					"Boolean",
+					"<-"
+				]
+			],
+			"Summary": ""
+		},
+		"_inheritedFrom_": "_core"
+	},
 	"Client": {
-		"buildArchive()": {
-			"Syntax": "**.buildArchive**()->result : Object",
+		"buildZip()": {
+			"Syntax": "**.buildZip**()->result : Object",
 			"Params": [
 				[
 					"result",
@@ -292,8 +306,8 @@
 			],
 			"Summary": ""
 		},
-		"buildZip()": {
-			"Syntax": "**.buildZip**()->result : Object",
+		"buildArchive()": {
+			"Syntax": "**.buildArchive**()->result : Object",
 			"Params": [
 				[
 					"result",
@@ -320,20 +334,6 @@
 				[
 					"",
 					"Text",
-					"<-"
-				]
-			],
-			"Summary": ""
-		},
-		"_inheritedFrom_": "_core"
-	},
-	"Component": {
-		"build()": {
-			"Syntax": "**.build**()->success : Boolean",
-			"Params": [
-				[
-					"success",
-					"Boolean",
 					"<-"
 				]
 			],
