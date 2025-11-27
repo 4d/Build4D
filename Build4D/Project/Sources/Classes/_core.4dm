@@ -30,6 +30,7 @@ property _currentProjectPackage : 4D.Folder
 property _projectPackage : 4D.Folder
 property _structureFolder : 4D.Folder
 property _target : Text
+property _rootFileNames : Collection
 
 property logs : Collection
 
@@ -66,6 +67,7 @@ Class constructor($target : Text; $customSettings : Object)
 	This._validInstance:=True
 	This._isCurrentProject:=True
 	
+	This._rootFileNames:=[]
 	This._projectFile:=File(Structure file(*); fk platform path)
 	This._currentProjectPackage:=Folder(Folder("/PACKAGE/"; *).platformPath; fk platform path)
 	If (($settings#Null) && ($settings.projectFile#Null) && \
@@ -524,6 +526,15 @@ Function _createStructure() : Boolean
 		$structureFolder.create()
 		
 		This._projectFile.parent.copyTo($structureFolder; fk overwrite)
+		
+		var $rootFile : 4D.File
+		var $rootFiles : Collection
+		$rootFiles:=This._rootFileNames.map(Formula($2._currentProjectPackage.file($1.value)); This)
+		For each ($rootFile; $rootFiles)
+			If ($rootFile.exists)
+				$rootFile.copyTo($structureFolder; fk overwrite)
+			End if 
+		End for each 
 		
 		// Remove source methods
 		$deletePaths:=New collection

@@ -22,6 +22,7 @@ Class constructor($customSettings : Object)
 			"severity"; Error message))
 	End if 
 	
+	This._rootFileNames:=["logo.png"; "logo.svg"]
 	
 	//MARK:-
 	
