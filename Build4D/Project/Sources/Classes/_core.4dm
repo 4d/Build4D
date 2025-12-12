@@ -838,8 +838,12 @@ Function _excludeModules() : Boolean
 	var $optionalModulesFile; $windowsAppRuntimeFile : 4D.File
 	var $optionalModules; $windowsAppRuntime : Object
 	var $paths; $modules : Collection
+	var $isBinaryDatabase : Boolean
 	
 	This._noError:=True
+	
+	// Detect if the database is binary (not a project database)
+	$isBinaryDatabase:=(This._projectFile.extension#".4DProject")
 	
 	If ((This.settings.excludeModules#Null) && (This.settings.excludeModules.length>0))
 		$optionalModulesFile:=(Is macOS) ? Folder(Application file; fk platform path).file("Contents/Resources/BuildappOptionalModules.json") : File(Application file; fk platform path).parent.file("Resources/BuildappOptionalModules.json")
@@ -856,6 +860,13 @@ Function _excludeModules() : Boolean
 					// Merge Windows runtime modules with optional modules
 					If (($windowsAppRuntime.modules#Null) && ($optionalModules.modules#Null))
 						$optionalModules.modules:=$optionalModules.modules.concat($windowsAppRuntime.modules)
+					End if 
+				End if 
+				
+				// For binary databases, automatically exclude "Windows App Runtime" module
+				If ($isBinaryDatabase)
+					If (This.settings.excludeModules.indexOf("Windows App Runtime")<0)
+						This.settings.excludeModules.push("Windows App Runtime")
 					End if 
 				End if 
 			End if 
@@ -884,6 +895,24 @@ Function _excludeModules() : Boolean
 				"severity"; Error message))
 			return False
 		End if 
+	End if 
+	
+	// For binary databases on Windows, delete specific Windows App Runtime files
+	If (Is Windows) && ($isBinaryDatabase)
+		var $runtimeFilesToDelete : Collection
+		$runtimeFilesToDelete:=New collection(\
+			"Microsoft.WindowsAppRuntime.Bootstrap.dll"; \
+			"XamlIslandsHelper.dll"; \
+			"windowsAppRuntimeBootstrap.pri")
+		
+		$basePath:=This.settings.destinationFolder.path
+		$paths:=New collection
+		
+		For each ($path; $runtimeFilesToDelete)
+			$paths.push($basePath+$path)
+		End for each 
+		
+		This._deletePaths($paths)
 	End if 
 	
 	return This._noError
