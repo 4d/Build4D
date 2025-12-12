@@ -835,8 +835,8 @@ $status        Boolean        out          True if all modules have been correct
 	
 Function _excludeModules() : Boolean
 	var $excludedModule; $path; $basePath : Text
-	var $optionalModulesFile : 4D.File
-	var $optionalModules : Object
+	var $optionalModulesFile; $windowsAppRuntimeFile : 4D.File
+	var $optionalModules; $windowsAppRuntime : Object
 	var $paths; $modules : Collection
 	
 	This._noError:=True
@@ -847,6 +847,18 @@ Function _excludeModules() : Boolean
 			$paths:=New collection
 			$basePath:=(Is macOS) ? This.settings.destinationFolder.path+"Contents/" : This.settings.destinationFolder.path
 			$optionalModules:=JSON Parse($optionalModulesFile.getText())
+			
+			// On Windows, also load BuildappWindowsAppRuntimeFiles.json
+			If (Is Windows)
+				$windowsAppRuntimeFile:=File(Application file; fk platform path).parent.file("Resources/BuildappWindowsAppRuntimeFiles.json")
+				If ($windowsAppRuntimeFile.exists)
+					$windowsAppRuntime:=JSON Parse($windowsAppRuntimeFile.getText())
+					// Merge Windows runtime modules with optional modules
+					If (($windowsAppRuntime.modules#Null) && ($optionalModules.modules#Null))
+						$optionalModules.modules:=$optionalModules.modules.concat($windowsAppRuntime.modules)
+					End if 
+				End if 
+			End if 
 			
 			For each ($excludedModule; This.settings.excludeModules)
 				$modules:=$optionalModules.modules.query("name = :1"; $excludedModule)
