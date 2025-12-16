@@ -204,6 +204,7 @@ Function _renameExecutable() : Boolean
 	Else 
 		$renamedExecutable:=This.settings.destinationFolder.file("4D Volume Desktop.4DE").rename(This.settings.buildName+".exe")
 		This.settings.destinationFolder.file("4D Volume Desktop.rsr").rename(This.settings.buildName+".rsr")
+		This.settings.destinationFolder.file("4D Volume Desktop.pri").rename(This.settings.buildName+".pri")
 	End if 
 	If ($renamedExecutable.name#This.settings.buildName)
 		This._log(New object(\
