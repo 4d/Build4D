@@ -375,6 +375,12 @@ Function _setAppOptions() : Boolean
 			$exeFile:=This.settings.destinationFolder.file(This.settings.buildName+".exe")
 			If ($exeFile.exists)
 				$exeInfo.OriginalFilename:=$exeFile.fullName
+				
+				// Set removeFluentUI for project databases when Windows App Runtime is excluded
+				If (This._projectFile.extension=".4DProject") && ((This.settings.excludeModules#Null) && (This.settings.excludeModules.indexOf("Windows App Runtime")>=0))
+					$exeInfo.removeFluentUI:=True
+				End if 
+				
 				$exeFile.setAppInfo($exeInfo)
 			Else 
 				This._log(New object(\
