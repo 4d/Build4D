@@ -331,12 +331,12 @@ Function _resolvePath($path : Variant; $baseFolder : 4D.Folder) : Object
 							
 							Case of 
 									
-								: (Folder($path; *).exists)
+								: ((Test path name($path)=Is a folder) && (Folder($path; *).exists))
 									
 									$absolutePath:=Folder(Folder($path; *).platformPath; fk platform path).path
 									
 									
-								: (File($path; *).exists)
+								: ((Test path name($path)=Is a document) && (File($path; *).exists))
 									
 									$absolutePath:=File(File($path; *).platformPath; fk platform path).path
 									
@@ -381,26 +381,26 @@ Function _resolvePath($path : Variant; $baseFolder : 4D.Folder) : Object
 			//https://github.com/4d/4d/issues/2139
 			//return ($absolutePath="@/") ? Folder(Folder($absolutePath; *).platformPath; fk platform path) : File(File($absolutePath; *).platformPath; fk platform path)
 			
-			$folder:=Folder($absolutePath; *)
 			
 			If ($absolutePath="@/")
-				
+				$folder:=Folder($absolutePath; *)
 			Else 
-				
 				$file:=File($absolutePath; *)  // generate a -1 error if path is a folder
-				
 			End if 
 			
 			Case of 
 					
-				: ($folder.isPackage)
+				: (($folder#Null) && ($folder.isPackage))
 					return Folder($folder.platformPath; fk platform path)
 					
-				: (Bool($file.isFile))
+				: (($file#Null) && (Bool($file.isFile)))
 					return File($file.platformPath; fk platform path)
 					
 				Else 
-					return Folder($folder.platformPath; fk platform path)
+					if ($folder#Null)
+						return Folder($folder.platformPath; fk platform path)
+					else
+						return Null
 					
 			End case 
 			
@@ -696,6 +696,7 @@ Function _deletePaths($paths : Collection) : Boolean
 	
 	var $path : Variant
 	var $deletePath : Object
+	var $pathType: Integer
 	
 	If (($paths#Null) && ($paths.length>0))
 		
@@ -712,9 +713,10 @@ Function _deletePaths($paths : Collection) : Boolean
 			End if 
 			
 			//If ($deletePath.exists)//https://github.com/4d/4d/issues/2139
-			If (Test path name(String($deletePath.platformPath))>=0)
+			$pathType:=Test path name(String($deletePath.platformPath))
+			If ($pathType>=0)
 				Case of 
-					: (OB Instance of($path; 4D.File))
+					: ($pathType=Is a file)
 						$deletePath.delete()
 					Else   // : (OB Instance of($path; 4D.Folder)) // if not 4D folder?
 						$deletePath.delete(fk recursive)
