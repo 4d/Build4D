@@ -397,10 +397,11 @@ Function _resolvePath($path : Variant; $baseFolder : 4D.Folder) : Object
 					return File($file.platformPath; fk platform path)
 					
 				Else 
-					if ($folder#Null)
+					If ($folder#Null)
 						return Folder($folder.platformPath; fk platform path)
-					else
+					Else 
 						return Null
+					End if 
 					
 			End case 
 			
@@ -696,7 +697,7 @@ Function _deletePaths($paths : Collection) : Boolean
 	
 	var $path : Variant
 	var $deletePath : Object
-	var $pathType: Integer
+	var $pathType : Integer
 	
 	If (($paths#Null) && ($paths.length>0))
 		
@@ -716,7 +717,7 @@ Function _deletePaths($paths : Collection) : Boolean
 			$pathType:=Test path name(String($deletePath.platformPath))
 			If ($pathType>=0)
 				Case of 
-					: ($pathType=Is a file)
+					: ($pathType=Is a document)
 						$deletePath.delete()
 					Else   // : (OB Instance of($path; 4D.Folder)) // if not 4D folder?
 						$deletePath.delete(fk recursive)
