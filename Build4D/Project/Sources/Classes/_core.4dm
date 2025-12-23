@@ -869,10 +869,10 @@ Function _excludeModules() : Boolean
 				// For binary databases, automatically exclude modules that don't have binaryAllowed flag set to true
 				If ($isBinaryDatabase)
 					If ($optionalModules.modules#Null)
-						For each ($module; $optionalModules.modules)
-							If (($module.binaryAllowed=Null) || ($module.binaryAllowed=False))
-								If (This.settings.excludeModules.indexOf($module.name)<0)
-									This.settings.excludeModules.push($module.name)
+						For each ($modules; $optionalModules.modules)
+							If (($modules.binaryAllowed=Null) || ($modules.binaryAllowed=False))
+								If (This.settings.excludeModules.indexOf($modules.name)<0)
+									This.settings.excludeModules.push($modules.name)
 								End if 
 							End if 
 						End for each 
