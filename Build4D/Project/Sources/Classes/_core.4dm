@@ -866,10 +866,16 @@ Function _excludeModules() : Boolean
 					End if 
 				End if 
 				
-				// For binary databases, automatically exclude "Windows App Runtime" module
+				// For binary databases, automatically exclude modules that don't have binaryAllowed flag set to true
 				If ($isBinaryDatabase)
-					If (This.settings.excludeModules.indexOf("Windows App Runtime")<0)
-						This.settings.excludeModules.push("Windows App Runtime")
+					If ($optionalModules.modules#Null)
+						For each ($module; $optionalModules.modules)
+							If (($module.binaryAllowed=Null) || ($module.binaryAllowed=False))
+								If (This.settings.excludeModules.indexOf($module.name)<0)
+									This.settings.excludeModules.push($module.name)
+								End if 
+							End if 
+						End for each 
 					End if 
 				End if 
 			End if 
