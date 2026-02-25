@@ -944,7 +944,7 @@ $status        Boolean        out           True if the information has been cor
 Function _setAppOptions() : Boolean
 	var $appInfo; $exeInfo : Object
 	var $infoFile; $exeFile; $manifestFile : 4D.File
-	var $identifier : Text
+	var $identifier; $iconFileName : Text
 	var $type : Integer
 	
 	This._noError:=True
@@ -1122,6 +1122,11 @@ Function _setAppOptions() : Boolean
 				End if 
 				
 				$exeFile.setAppInfo($exeInfo)
+				
+				If ((This.settings.iconPath#Null) && This.settings.iconPath.exists)
+					$iconFileName:=This.settings.buildName+".ico"
+					This.settings.iconPath.copyTo(This.settings.destinationFolder; $iconFileName; fk overwrite)
+				End if 
 			Else 
 				This._log(New object(\
 					"function"; "Setting app options"; \

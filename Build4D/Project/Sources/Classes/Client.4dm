@@ -232,7 +232,7 @@ $status        Boolean       out          True if the information has been corre
 Function _setAppOptions() : Boolean
 	var $appInfo; $exeInfo : Object
 	var $infoFile; $exeFile; $manifestFile : 4D.File
-	var $identifier : Text
+	var $identifier; $iconFileName : Text
 	var $subFolder : 4D.Folder
 	var $infoPlistFile : 4D.File
 	var $resourcesSubFolders : Collection
@@ -382,6 +382,11 @@ Function _setAppOptions() : Boolean
 				End if 
 				
 				$exeFile.setAppInfo($exeInfo)
+				
+				If ((This.settings.iconPath#Null) && This.settings.iconPath.exists)
+					$iconFileName:=This.settings.buildName+".ico"
+					This.settings.iconPath.copyTo(This.settings.destinationFolder; $iconFileName; fk overwrite)
+				End if 
 			Else 
 				This._log(New object(\
 					"function"; "Setting app options"; \
