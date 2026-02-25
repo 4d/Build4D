@@ -10,7 +10,7 @@ permissions:
 env:
   TOOL4D_PRODUCT_LINE: 'main'
   TOOL4D_VERSION: 'main'
-  TOOL4D_BUILDNUMBER : 'latest'
+  TOOL4D_BUILDNUMBER : '299458'
 
 
 jobs:
