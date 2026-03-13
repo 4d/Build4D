@@ -53,7 +53,7 @@ jobs:
           cp -r ${{ github.workspace }}/${{ github.event.repository.name }}/build/ ${{ github.workspace }}/${{ github.event.repository.name }}_UnitTests/Components
 
       - name: Checkout setup4d-action
-        uses:  actions/checkout@v4
+        uses:  actions/checkout@v6
         with: 
           repository: 4d/setup4d-action
           token: ${{ secrets.GH_4D_ACTION_TOKEN }}
