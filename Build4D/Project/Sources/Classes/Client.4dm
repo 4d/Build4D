@@ -503,6 +503,7 @@ Function build() : Boolean
 	$success:=($success) ? This._checkDestinationFolder() : False
 	//$success:=($success) ? This._compileProject() : False  // util ?
 	$success:=($success) ? This._copySourceApp() : False
+	$success:=($success) ? This._removeSignature() : False
 	$success:=($success) ? This._renameExecutable() : False
 	$success:=($success) ? This._setAppOptions() : False
 	$success:=($success) ? This._excludeModules() : False

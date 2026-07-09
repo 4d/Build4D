@@ -1432,6 +1432,55 @@ Function _change_uuid() : Boolean
 		return True
 	End if 
 	
+	//MARK:- Removes the code signature inherited from the copied source application.
+	
+/*
+Function _removeSignature()-> $status : Boolean
+....................................................................................
+Parameter      Type          in/out         Description
+....................................................................................
+$status        Boolean        out           True if the signature has been removed or removal is not applicable.
+....................................................................................
+	
+Removes the macOS code signature inherited from the copied source application (4D Volume Desktop / 4D Server)
+before it gets modified. Renaming the executable, editing the Info.plist, excluding modules or changing the
+uuids invalidates the inherited signature, so it is stripped right after the copy to guarantee a clean state
+before the application is eventually re-signed by _sign().
+*/
+	
+Function _removeSignature() : Boolean
+	
+	var $commandLine : Text
+	var $worker : 4D.SystemWorker
+	
+	If (This.is_mac_target && Is macOS)
+		
+		If (This.settings.destinationFolder.exists)
+			
+			$commandLine:="/usr/bin/codesign --remove-signature --deep '"+This.toPosix(This.settings.destinationFolder).path+"'"
+			
+			$worker:=4D.SystemWorker.new($commandLine)
+			$worker.wait()
+			
+			If ($worker.terminated && ($worker.exitCode=0))
+				This._log(New object(\
+					"function"; "Remove signature"; \
+					"message"; "Source application signature removed."; \
+					"severity"; Information message))
+			Else 
+				This._log(New object(\
+					"function"; "Remove signature"; \
+					"message"; "Unable to remove the source application signature."; \
+					"severity"; Warning message; \
+					"signatureReturn"; $worker.response))
+			End if 
+			
+		End if 
+		
+	End if 
+	
+	return True
+	
 	//MARK:- Signs the project
 	
 /*
