@@ -872,6 +872,7 @@ Function build() : Boolean
 	$success:=($success) ? This._createStructure() : False
 	$success:=($success) ? This._fix_settings() : False
 	$success:=($success) ? This._copySourceApp() : False
+	$success:=($success) ? This._removeSignature() : False
 	$success:=($success) ? This._renameExecutable() : False
 	$success:=($success) ? This._setAppOptions() : False
 	$success:=($success) ? This._excludeModules() : False  //#2029

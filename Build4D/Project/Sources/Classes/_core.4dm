@@ -1432,6 +1432,178 @@ Function _change_uuid() : Boolean
 		return True
 	End if 
 	
+	//MARK:- Removes the code signature inherited from the copied source application.
+	
+/*
+Function _removeSignature()-> $status : Boolean
+....................................................................................
+Parameter      Type          in/out         Description
+....................................................................................
+$status        Boolean        out           True if the signature has been removed or removal is not applicable.
+....................................................................................
+	
+Removes the code signature inherited from the copied source application (4D Volume Desktop / 4D Server)
+before it gets modified. Renaming the executable, editing the Info.plist, excluding modules or changing the
+uuids invalidates the inherited signature, so it is stripped right after the copy to guarantee a clean state
+before the application is eventually re-signed.
+On macOS the whole bundle signature is removed with codesign. On Windows the Authenticode signature is stripped
+from the main executable (4D Volume Desktop.4DE / 4D Server.exe) by clearing its PE certificate table, so that
+a customer re-signing the built application starts from a clean, unsigned executable.
+*/
+	
+Function _removeSignature() : Boolean
+	
+	var $commandLine : Text
+	var $worker : 4D.SystemWorker
+	var $executable : 4D.File
+	
+	Case of 
+			
+		: (This.is_mac_target && Is macOS)
+			
+			If (This.settings.destinationFolder.exists)
+				
+				$commandLine:="/usr/bin/codesign --remove-signature --deep '"+This.toPosix(This.settings.destinationFolder).path+"'"
+				
+				$worker:=4D.SystemWorker.new($commandLine)
+				$worker.wait()
+				
+				If ($worker.terminated && ($worker.exitCode=0))
+					This._log(New object(\
+						"function"; "Remove signature"; \
+						"message"; "Source application signature removed."; \
+						"severity"; Information message))
+				Else 
+					This._log(New object(\
+						"function"; "Remove signature"; \
+						"message"; "Unable to remove the source application signature."; \
+						"severity"; Warning message; \
+						"signatureReturn"; $worker.response))
+				End if 
+				
+			End if 
+			
+		: (This.is_win_target)
+			
+			$executable:=This.settings.destinationFolder.file("4D Volume Desktop.4DE")
+			If (Not($executable.exists))
+				$executable:=This.settings.destinationFolder.file("4D Server.exe")
+			End if 
+			This._removeWindowsSignature($executable)
+			
+	End case 
+	
+	return True
+	
+	//MARK:- Removes the Windows Authenticode signature from a PE executable.
+	
+/*
+Function _removeWindowsSignature($executable : 4D.File)-> $status : Boolean
+....................................................................................
+Parameter      Type          in/out         Description
+....................................................................................
+$executable    4D.File        in            PE executable to strip (4D Volume Desktop.4DE / 4D Server.exe).
+$status        Boolean        out           True once processed (best effort, never blocks the build).
+....................................................................................
+	
+Clears the attribute certificate table referenced by the PE "security" data directory (entry #4) and truncates
+the appended signature block. The PE checksum is reset because it is no longer valid. This leaves a clean,
+unsigned executable that can be modified by the build and, if needed, re-signed afterwards by the customer.
+*/
+	
+Function _removeWindowsSignature($executable : 4D.File) : Boolean
+	
+	var $blob : Blob
+	var $fileSize; $peOffset; $optOffset; $magic; $dataDirOffset; $secDirOffset : Integer
+	var $certOffset; $certSize; $i : Integer
+	
+	If (Not($executable.exists))
+		return True
+	End if 
+	
+	$blob:=$executable.getContent()
+	$fileSize:=BLOB size($blob)
+	
+	// Must hold a full PE header
+	If ($fileSize<512)
+		return True
+	End if 
+	
+	// DOS signature 'MZ' ('M'=77, 'Z'=90)
+	If (($blob{0}#77) || ($blob{1}#90))
+		return True
+	End if 
+	
+	// e_lfanew: file offset of the PE header, 4-byte little-endian value at offset 60 (0x3C)
+	$peOffset:=$blob{60}+($blob{61}*256)+($blob{62}*65536)+($blob{63}*16777216)
+	
+	If (($peOffset<64) || (($peOffset+64)>=$fileSize))
+		return True
+	End if 
+	
+	// PE signature 'PE\0\0' ('P'=80, 'E'=69)
+	If (($blob{$peOffset}#80) || ($blob{$peOffset+1}#69) || ($blob{$peOffset+2}#0) || ($blob{$peOffset+3}#0))
+		return True
+	End if 
+	
+	// Optional header starts after the PE signature (4 bytes) and the COFF header (20 bytes)
+	$optOffset:=$peOffset+24
+	
+	// Optional header magic: 267 (0x10B) = PE32, 523 (0x20B) = PE32+
+	$magic:=$blob{$optOffset}+($blob{$optOffset+1}*256)
+	
+	Case of 
+			
+		: ($magic=267)  // PE32: data directories start at optional header offset 96
+			$dataDirOffset:=$optOffset+96
+			
+		: ($magic=523)  // PE32+: data directories start at optional header offset 112
+			$dataDirOffset:=$optOffset+112
+			
+		Else 
+			return True  // Not a recognized PE optional header
+			
+	End case 
+	
+	// "Security" directory is data directory entry #4 (each entry is 8 bytes: 4 offset + 4 size)
+	$secDirOffset:=$dataDirOffset+(4*8)
+	
+	If (($secDirOffset+8)>$fileSize)
+		return True
+	End if 
+	
+	$certOffset:=$blob{$secDirOffset}+($blob{$secDirOffset+1}*256)+($blob{$secDirOffset+2}*65536)+($blob{$secDirOffset+3}*16777216)
+	$certSize:=$blob{$secDirOffset+4}+($blob{$secDirOffset+5}*256)+($blob{$secDirOffset+6}*65536)+($blob{$secDirOffset+7}*16777216)
+	
+	If (($certOffset<=0) || ($certSize<=0))
+		return True  // No Authenticode signature present
+	End if 
+	
+	// Clear the security data directory entry (8 bytes)
+	For ($i; 0; 7)
+		$blob{$secDirOffset+$i}:=0
+	End for 
+	
+	// Reset the PE checksum (optional header offset 64): it is no longer valid
+	For ($i; 0; 3)
+		$blob{$optOffset+64+$i}:=0
+	End for 
+	
+	// The certificate table is stored at the very end of the file: remove it
+	If (($certOffset<$fileSize) && (($certOffset+$certSize)>=($fileSize-16)))
+		SET BLOB SIZE($blob; $certOffset)
+	End if 
+	
+	$executable.setContent($blob)
+	
+	This._log(New object(\
+		"function"; "Remove signature"; \
+		"message"; "Source application signature removed."; \
+		"severity"; Information message; \
+		"path"; $executable.path))
+	
+	return True
+	
 	//MARK:- Signs the project
 	
 /*
